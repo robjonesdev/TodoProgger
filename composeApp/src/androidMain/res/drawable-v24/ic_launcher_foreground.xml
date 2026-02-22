@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="30"
+        android:translateY="30">
+        <!-- Progress Ring (Background) - Scaled to 48x48 inside 108x108 -->
+        <path
+            android:fillColor="#33FFFFFF"
+            android:pathData="M24,4C12.96,4 4,12.96 4,24s8.96,20 20,20 20,-8.96 20,-20S35.04,4 24,4zM24,40c-8.82,0 -16,-7.18 -16,-16s7.18,-16 16,-16 16,7.18 16,16 -7.18,16 -16,16z"/>
+        <!-- Progress Arc (Active) -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M24,4c-11.04,0 -20,8.96 -20,20h4c0,-8.84 7.16,-16 16,-16V4z"/>
+        <!-- Checkmark -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M20,30.34l-6.84,-6.84 -2.82,2.82L20,36l18,-18 -2.82,-2.82z"/>
+    </group>
+</vector>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="todo_list_title">Todo Progger</string>
+    <string name="todo_detail_screen_title">Editing Todo</string>
+</resources>
