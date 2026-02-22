@@ -41,6 +41,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.compose.materialIconsExtended)
+            implementation(libs.androidx.navigation.compose)
             
             // Room Dependencies
             implementation(libs.androidx.room.runtime)
