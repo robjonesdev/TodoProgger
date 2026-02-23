@@ -18,6 +18,7 @@ import com.robjonesdev.todoprogger.presentation.screens.TodoListScreen
 import com.robjonesdev.todoprogger.presentation.screens.SettingsScreen
 import com.robjonesdev.todoprogger.presentation.theme.TodoProggerTheme
 import com.robjonesdev.todoprogger.presentation.viewmodels.TodoListViewModel
+import com.robjonesdev.todoprogger.presentation.viewmodels.SettingsViewModel
 
 @Composable
 fun TodoApp(context: Any? = null) {
@@ -25,6 +26,9 @@ fun TodoApp(context: Any? = null) {
     val dao = remember { database.todoDao() }
     val todoListViewModel = remember { TodoListViewModel(dao) }
     val todoTaskList by todoListViewModel.todoTasks.collectAsState()
+    
+    val settingsViewModel = remember { SettingsViewModel() }
+    val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
     
     val reminderScheduler = remember { getReminderScheduler(context) }
     var taskToSchedule by remember { mutableStateOf<com.robjonesdev.todoprogger.domain.models.TodoTask?>(null) }
@@ -36,7 +40,7 @@ fun TodoApp(context: Any? = null) {
     val onUpdateTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.updateTask(task) } }
     val onScheduleReminder = remember { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> taskToSchedule = task } }
 
-    TodoProggerTheme {
+    TodoProggerTheme(appTheme = selectedTheme) {
         Surface(
             modifier = androidx.compose.ui.Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
@@ -80,6 +84,8 @@ fun TodoApp(context: Any? = null) {
                 }
                 composable(TodoScreen.Settings.route) {
                     SettingsScreen(
+                        selectedTheme = selectedTheme,
+                        onThemeSelected = { settingsViewModel.setTheme(it) },
                         onBackTapped = { navController.popBackStack() }
                     )
                 }
