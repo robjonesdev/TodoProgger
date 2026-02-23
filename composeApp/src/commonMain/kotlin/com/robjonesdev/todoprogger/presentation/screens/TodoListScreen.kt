@@ -3,6 +3,7 @@ package com.robjonesdev.todoprogger.presentation.screens
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import todoprogger.composeapp.generated.resources.todo_list_title
 fun TodoListScreen(
     todoTaskList: List<TodoTask>,
     onAddNewTodo: () -> Unit,
+    onSettingsTapped: () -> Unit,
     onDeleteTask: (TodoTask) -> Unit,
     onUpdateTask: (TodoTask) -> Unit,
     onScheduleReminder: (TodoTask) -> Unit,
@@ -38,7 +40,14 @@ fun TodoListScreen(
                     IconButton(onClick = onAddNewTodo) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Add New Todo",
+                            contentDescription = "Add New Todo Button",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    IconButton(onClick = onSettingsTapped) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings Button",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }

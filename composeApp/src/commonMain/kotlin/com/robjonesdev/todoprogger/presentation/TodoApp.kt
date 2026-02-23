@@ -15,6 +15,7 @@ import com.robjonesdev.todoprogger.domain.reminders.getReminderScheduler
 import com.robjonesdev.todoprogger.presentation.composables.ReminderPickerDialog
 import com.robjonesdev.todoprogger.presentation.screens.TodoDetailScreen
 import com.robjonesdev.todoprogger.presentation.screens.TodoListScreen
+import com.robjonesdev.todoprogger.presentation.screens.SettingsScreen
 import com.robjonesdev.todoprogger.presentation.theme.TodoProggerTheme
 import com.robjonesdev.todoprogger.presentation.viewmodels.TodoListViewModel
 
@@ -48,6 +49,9 @@ fun TodoApp(context: Any? = null) {
                     TodoListScreen(
                         todoTaskList = todoTaskList,
                         onAddNewTodo = onAddNewTodo,
+                        onSettingsTapped = {
+                            navController.navigate(TodoScreen.Settings.route)
+                        },
                         onDeleteTask = onDeleteTask,
                         onUpdateTask = onUpdateTask,
                         onScheduleReminder = onScheduleReminder,
@@ -73,6 +77,11 @@ fun TodoApp(context: Any? = null) {
                             }
                         )
                     }
+                }
+                composable(TodoScreen.Settings.route) {
+                    SettingsScreen(
+                        onBackTapped = { navController.popBackStack() }
+                    )
                 }
             }
         }
