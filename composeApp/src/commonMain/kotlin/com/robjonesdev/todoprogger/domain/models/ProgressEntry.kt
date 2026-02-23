@@ -1,12 +1,13 @@
 package com.robjonesdev.todoprogger.domain.models
 
+import kotlinx.serialization.Serializable
+
 /**
  * A sub-entry in a [TodoTask] that represents a step or partial accomplishment.
- * [ProgressEntry] instances always have a parent [TodoTask] with which they are associated.
  */
+@Serializable
 data class ProgressEntry(
-    val parent: TodoTask,
     val id: Int,
     val description: String,
-    val isCompleted: Boolean,
+    val isCompleted: Boolean = false,
 )

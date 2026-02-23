@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 data class TodoTask(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val title: String = "New To-Do",
-    val description: String = "Tap to edit, Swipe left to delete",
+    val title: String = "Title: New To-Do",
+    val description: String = "Description: Tap to edit, Swipe left to delete",
+    val progressEntries: List<ProgressEntry> = emptyList(),
     var isCompleted: Boolean = false,
 )
