@@ -25,9 +25,11 @@ fun TodoApp(context: Any? = null) {
 
     val navController = rememberNavController()
 
+    val onAddNewTodo = remember(todoListViewModel) { { todoListViewModel.addNewTodo() } }
+    val onDeleteTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.deleteTask(task) } }
+    val onUpdateTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.updateTask(task) } }
+
     TodoProggerTheme {
-        // Wrapping the NavHost in a Surface ensures that the background 
-        // behind transitions matches the theme (preventing white flashes in Dark Mode)
         Surface(
             modifier = androidx.compose.ui.Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
@@ -39,9 +41,9 @@ fun TodoApp(context: Any? = null) {
                 composable(TodoScreen.List.route) {
                     TodoListScreen(
                         todoTaskList = todoTaskList,
-                        onAddNewTodo = { todoListViewModel.addNewTodo() },
-                        onDeleteTask = { todoListViewModel.deleteTask(it) },
-                        onUpdateTask = { todoListViewModel.updateTask(it) },
+                        onAddNewTodo = onAddNewTodo,
+                        onDeleteTask = onDeleteTask,
+                        onUpdateTask = onUpdateTask,
                         onItemTapped = { task ->
                             navController.navigate("detail/${task.id}")
                         }
