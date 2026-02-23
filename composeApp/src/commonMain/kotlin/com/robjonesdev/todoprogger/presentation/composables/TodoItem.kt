@@ -21,17 +21,21 @@ import com.robjonesdev.todoprogger.domain.models.TodoTask
  *
  * @param item The [TodoTask] data model to display.
  * @param onToggleComplete Callback triggered when the complete icon is tapped.
+ * @param onClick Callback triggered when the item is tapped.
  * @param modifier The modifier to be applied to the entire item.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoItem(
     item: TodoTask,
     onToggleComplete: (TodoTask) -> Unit = {},
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     Card(
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
