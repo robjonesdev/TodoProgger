@@ -11,14 +11,23 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.domain.models.ProgressEntry
 import com.robjonesdev.todoprogger.domain.models.TodoTask
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.Res
 import todoprogger.composeapp.generated.resources.todo_detail_screen_title
+
+val progressEntriesSaver: Saver<List<ProgressEntry>, String> = Saver(
+    save = { Json.encodeToString(it) },
+    restore = { Json.decodeFromString(it) }
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,12 +37,12 @@ fun TodoDetailScreen(
     onSaveTapped: (TodoTask) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var title by remember { mutableStateOf(todoTask.title) }
-    var description by remember { mutableStateOf(todoTask.description) }
-    var progressEntries by remember { mutableStateOf(todoTask.progressEntries) }
+    var title by rememberSaveable { mutableStateOf(todoTask.title) }
+    var description by rememberSaveable { mutableStateOf(todoTask.description) }
+    var progressEntries by rememberSaveable(stateSaver = progressEntriesSaver) { mutableStateOf(todoTask.progressEntries) }
     
-    var showAddEntryDialog by remember { mutableStateOf(false) }
-    var newEntryText by remember { mutableStateOf("") }
+    var showAddEntryDialog by rememberSaveable { mutableStateOf(false) }
+    var newEntryText by rememberSaveable { mutableStateOf("") }
     
     val scrollState = rememberScrollState()
 

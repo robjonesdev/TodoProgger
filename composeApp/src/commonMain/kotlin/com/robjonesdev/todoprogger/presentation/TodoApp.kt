@@ -1,5 +1,8 @@
 package com.robjonesdev.todoprogger.presentation
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,37 +26,44 @@ fun TodoApp(context: Any? = null) {
     val navController = rememberNavController()
 
     TodoProggerTheme {
-        NavHost(
-            navController = navController,
-            startDestination = TodoScreen.List.route
+        // Wrapping the NavHost in a Surface ensures that the background 
+        // behind transitions matches the theme (preventing white flashes in Dark Mode)
+        Surface(
+            modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
         ) {
-            composable(TodoScreen.List.route) {
-                TodoListScreen(
-                    todoTaskList = todoTaskList,
-                    onAddNewTodo = { todoListViewModel.addNewTodo() },
-                    onDeleteTask = { todoListViewModel.deleteTask(it) },
-                    onUpdateTask = { todoListViewModel.updateTask(it) },
-                    onItemTapped = { task ->
-                        navController.navigate("detail/${task.id}")
-                    }
-                )
-            }
-            composable(
-                route = TodoScreen.Detail.route,
-                arguments = listOf(navArgument("taskId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val taskId = backStackEntry.arguments?.getInt("taskId")
-                val task = todoTaskList.find { it.id == taskId }
-
-                if (task != null) {
-                    TodoDetailScreen(
-                        todoTask = task,
-                        onBackTapped = { navController.popBackStack() },
-                        onSaveTapped = { updatedTask ->
-                            todoListViewModel.updateTask(updatedTask)
-                            navController.popBackStack()
+            NavHost(
+                navController = navController,
+                startDestination = TodoScreen.List.route
+            ) {
+                composable(TodoScreen.List.route) {
+                    TodoListScreen(
+                        todoTaskList = todoTaskList,
+                        onAddNewTodo = { todoListViewModel.addNewTodo() },
+                        onDeleteTask = { todoListViewModel.deleteTask(it) },
+                        onUpdateTask = { todoListViewModel.updateTask(it) },
+                        onItemTapped = { task ->
+                            navController.navigate("detail/${task.id}")
                         }
                     )
+                }
+                composable(
+                    route = TodoScreen.Detail.route,
+                    arguments = listOf(navArgument("taskId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val taskId = backStackEntry.arguments?.getInt("taskId")
+                    val task = todoTaskList.find { it.id == taskId }
+
+                    if (task != null) {
+                        TodoDetailScreen(
+                            todoTask = task,
+                            onBackTapped = { navController.popBackStack() },
+                            onSaveTapped = { updatedTask ->
+                                todoListViewModel.updateTask(updatedTask)
+                                navController.popBackStack()
+                            }
+                        )
+                    }
                 }
             }
         }

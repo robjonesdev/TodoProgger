@@ -71,6 +71,7 @@ fun TodoList(
 
     if(showConfirmDeletionDialog) {
         ConfirmDeletionDialog(
+            todoName = selectedDeletionCandidate?.title ?: "Unknown",
             onRejectDeletion = {
                 showConfirmDeletionDialog = false
                 selectedDeletionCandidate = null

@@ -18,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.robjonesdev.todoprogger.domain.models.TodoTask
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmDeletionDialog(
+    todoName: String,
     title: String = "Delete Todo?",
-    description: String = "Are you certain you want to delete this todo? This cannot be undone.",
+    description: String = "Are you certain you want to delete the Todo: \"${todoName}\"? This cannot be undone.",
     modifier: Modifier = Modifier,
     onRejectDeletion: () -> Unit,
     onConfirmDeletion: () -> Unit,
