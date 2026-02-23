@@ -9,5 +9,5 @@ data class TodoTask(
     val id: Int = 0,
     val title: String = "New To-Do",
     val description: String = "Tap to edit, Swipe left to delete",
-    val isCompleted: Boolean = false,
+    var isCompleted: Boolean = false,
 )

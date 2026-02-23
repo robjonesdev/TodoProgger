@@ -18,6 +18,7 @@ fun TodoListScreen(
     todoTaskList: List<TodoTask>,
     onAddNewTodo: () -> Unit,
     onDeleteTask: (TodoTask) -> Unit,
+    onUpdateTask: (TodoTask) -> Unit,
     onItemTapped: (TodoTask) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -52,7 +53,8 @@ fun TodoListScreen(
             modifier = Modifier.padding(innerPadding),
             items = todoTaskList,
             onItemTapped = onItemTapped,
-            onDelete = onDeleteTask
+            onDelete = onDeleteTask,
+            onUpdateTask = onUpdateTask
         )
     }
 }

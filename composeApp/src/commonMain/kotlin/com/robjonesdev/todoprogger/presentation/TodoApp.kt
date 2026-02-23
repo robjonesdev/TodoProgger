@@ -32,6 +32,7 @@ fun TodoApp(context: Any? = null) {
                     todoTaskList = todoTaskList,
                     onAddNewTodo = { todoListViewModel.addNewTodo() },
                     onDeleteTask = { todoListViewModel.deleteTask(it) },
+                    onUpdateTask = { todoListViewModel.updateTask(it) },
                     onItemTapped = { task ->
                         navController.navigate("detail/${task.id}")
                     }
