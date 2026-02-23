@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import com.robjonesdev.todoprogger.domain.models.TodoTask
  *
  * @param item The [TodoTask] data model to display.
  * @param onToggleComplete Callback triggered when the complete icon is tapped.
+ * @param onScheduleReminder Callback triggered when the set reminder icon is tapped.
  * @param onClick Callback triggered when the item is tapped.
  * @param modifier The modifier to be applied to the entire item.
  */
@@ -29,6 +31,7 @@ import com.robjonesdev.todoprogger.domain.models.TodoTask
 fun TodoItem(
     item: TodoTask,
     onToggleComplete: (TodoTask) -> Unit = {},
+    onScheduleReminder: (TodoTask) -> Unit = {},
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -87,6 +90,20 @@ fun TodoItem(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
+                        SuggestionChip(
+                            onClick = { onScheduleReminder(item) },
+                            label = { Text("Set Reminder") },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = "Set reminder",
+                                    modifier = Modifier.size(SuggestionChipDefaults.IconSize)
+                                )
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
                         SuggestionChip(
                             onClick = { onToggleComplete(item) },
                             label = { Text(if (item.isCompleted) "Completed" else "Complete") },

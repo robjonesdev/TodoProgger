@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.robjonesdev.todoprogger.data.getDatabase
 import com.robjonesdev.todoprogger.data.getDatabaseBuilder
+import com.robjonesdev.todoprogger.domain.reminders.getReminderScheduler
+import com.robjonesdev.todoprogger.presentation.composables.ReminderPickerDialog
 import com.robjonesdev.todoprogger.presentation.screens.TodoDetailScreen
 import com.robjonesdev.todoprogger.presentation.screens.TodoListScreen
 import com.robjonesdev.todoprogger.presentation.theme.TodoProggerTheme
@@ -22,12 +24,16 @@ fun TodoApp(context: Any? = null) {
     val dao = remember { database.todoDao() }
     val todoListViewModel = remember { TodoListViewModel(dao) }
     val todoTaskList by todoListViewModel.todoTasks.collectAsState()
+    
+    val reminderScheduler = remember { getReminderScheduler(context) }
+    var taskToSchedule by remember { mutableStateOf<com.robjonesdev.todoprogger.domain.models.TodoTask?>(null) }
 
     val navController = rememberNavController()
 
     val onAddNewTodo = remember(todoListViewModel) { { todoListViewModel.addNewTodo() } }
     val onDeleteTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.deleteTask(task) } }
     val onUpdateTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.updateTask(task) } }
+    val onScheduleReminder = remember { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> taskToSchedule = task } }
 
     TodoProggerTheme {
         Surface(
@@ -44,6 +50,7 @@ fun TodoApp(context: Any? = null) {
                         onAddNewTodo = onAddNewTodo,
                         onDeleteTask = onDeleteTask,
                         onUpdateTask = onUpdateTask,
+                        onScheduleReminder = onScheduleReminder,
                         onItemTapped = { task ->
                             navController.navigate("detail/${task.id}")
                         }
@@ -68,6 +75,16 @@ fun TodoApp(context: Any? = null) {
                     }
                 }
             }
+        }
+        
+        taskToSchedule?.let { task ->
+            ReminderPickerDialog(
+                onDismiss = { taskToSchedule = null },
+                onConfirm = { dateTime ->
+                    reminderScheduler.schedule(task, dateTime)
+                    taskToSchedule = null
+                }
+            )
         }
     }
 }

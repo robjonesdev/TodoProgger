@@ -23,6 +23,7 @@ import com.robjonesdev.todoprogger.domain.utils.e
  * @param onItemTapped Callback triggered when an item is tapped.
  * @param onDelete Callback triggered when an item is swiped to delete.
  * @param onUpdateTask Callback triggered when an item needs to be updated (e.g. toggling completion).
+ * @param onScheduleReminder Callback triggered when the schedule icon is tapped.
  * @param modifier The modifier to be applied to the underlying [LazyColumn].
  * @param listState The state of the [LazyColumn].
  */
@@ -32,6 +33,7 @@ fun TodoList(
     onItemTapped: (TodoTask) -> Unit,
     onDelete: (TodoTask) -> Unit,
     onUpdateTask: (TodoTask) -> Unit,
+    onScheduleReminder: (TodoTask) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState()
 ) {
@@ -57,6 +59,7 @@ fun TodoList(
                 TodoItem(
                     item = task,
                     onToggleComplete = { onUpdateTask(it.copy(isCompleted = !it.isCompleted)) },
+                    onScheduleReminder = { onScheduleReminder(it) },
                     onClick = { onItemTapped(task) }
                 )
             }

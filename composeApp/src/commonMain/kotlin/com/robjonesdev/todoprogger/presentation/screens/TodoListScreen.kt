@@ -19,6 +19,7 @@ fun TodoListScreen(
     onAddNewTodo: () -> Unit,
     onDeleteTask: (TodoTask) -> Unit,
     onUpdateTask: (TodoTask) -> Unit,
+    onScheduleReminder: (TodoTask) -> Unit,
     onItemTapped: (TodoTask) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -54,7 +55,8 @@ fun TodoListScreen(
             items = todoTaskList,
             onItemTapped = onItemTapped,
             onDelete = onDeleteTask,
-            onUpdateTask = onUpdateTask
+            onUpdateTask = onUpdateTask,
+            onScheduleReminder = onScheduleReminder
         )
     }
 }
