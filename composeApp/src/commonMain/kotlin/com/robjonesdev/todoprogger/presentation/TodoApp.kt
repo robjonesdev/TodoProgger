@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.robjonesdev.todoprogger.data.getDatabase
 import com.robjonesdev.todoprogger.data.getDatabaseBuilder
+import com.robjonesdev.todoprogger.domain.models.TodoTask
 import com.robjonesdev.todoprogger.domain.reminders.getReminderScheduler
 import com.robjonesdev.todoprogger.presentation.composables.ReminderPickerDialog
 import com.robjonesdev.todoprogger.presentation.screens.TodoDetailScreen
@@ -31,15 +32,53 @@ fun TodoApp(context: Any? = null) {
     val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
     
     val reminderScheduler = remember { getReminderScheduler(context) }
-    var taskToSchedule by remember { mutableStateOf<com.robjonesdev.todoprogger.domain.models.TodoTask?>(null) }
+    var taskToSchedule by remember { mutableStateOf<TodoTask?>(null) }
 
     val navController = rememberNavController()
 
+    // Optimization: Remember lambdas to prevent unnecessary recompositions of child screens
     val onAddNewTodo = remember(todoListViewModel) { { todoListViewModel.addNewTodo() } }
-    val onDeleteTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.deleteTask(task) } }
-    val onUpdateTask = remember(todoListViewModel) { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> todoListViewModel.updateTask(task) } }
-    val onScheduleReminder = remember { { task: com.robjonesdev.todoprogger.domain.models.TodoTask -> taskToSchedule = task } }
+    val onDeleteTask = remember(todoListViewModel) { { task: TodoTask -> todoListViewModel.deleteTask(task) } }
+    val onUpdateTask = remember(todoListViewModel) { { task: TodoTask -> todoListViewModel.updateTask(task) } }
+    val onScheduleReminder = remember { { task: TodoTask -> taskToSchedule = task } }
+    
+    // Navigation Lambdas, keys passed here ensure that the composable still recomposes
+    // when the keys change
+    val onSettingsTapped = remember(navController) { 
+        { 
+            navController.navigate(TodoScreen.Settings.route) 
+            Unit
+        } 
+    }
 
+    val onItemTapped = remember(navController) { 
+        { task: TodoTask -> 
+            navController.navigate("detail/${task.id}")
+            Unit
+        } 
+    }
+
+    val onBackTapped = remember(navController) { 
+        { 
+            navController.popBackStack()
+            Unit
+        } 
+    }
+
+    val onSaveTask = remember(todoListViewModel, navController) { 
+        { task: TodoTask -> 
+            todoListViewModel.updateTask(task)
+            navController.popBackStack()
+            Unit
+        } 
+    }
+
+    val onThemeSelected = remember(settingsViewModel) { 
+        { theme: com.robjonesdev.todoprogger.presentation.theme.AppTheme -> 
+            settingsViewModel.setTheme(theme) 
+        } 
+    }
+    
     TodoProggerTheme(appTheme = selectedTheme) {
         Surface(
             modifier = androidx.compose.ui.Modifier.fillMaxSize(),
@@ -53,15 +92,11 @@ fun TodoApp(context: Any? = null) {
                     TodoListScreen(
                         todoTaskList = todoTaskList,
                         onAddNewTodo = onAddNewTodo,
-                        onSettingsTapped = {
-                            navController.navigate(TodoScreen.Settings.route)
-                        },
+                        onSettingsTapped = onSettingsTapped,
                         onDeleteTask = onDeleteTask,
                         onUpdateTask = onUpdateTask,
                         onScheduleReminder = onScheduleReminder,
-                        onItemTapped = { task ->
-                            navController.navigate("detail/${task.id}")
-                        }
+                        onItemTapped = onItemTapped
                     )
                 }
                 composable(
@@ -74,19 +109,16 @@ fun TodoApp(context: Any? = null) {
                     if (task != null) {
                         TodoDetailScreen(
                             todoTask = task,
-                            onBackTapped = { navController.popBackStack() },
-                            onSaveTapped = { updatedTask ->
-                                todoListViewModel.updateTask(updatedTask)
-                                navController.popBackStack()
-                            }
+                            onBackTapped = onBackTapped,
+                            onSaveTapped = onSaveTask
                         )
                     }
                 }
                 composable(TodoScreen.Settings.route) {
                     SettingsScreen(
                         selectedTheme = selectedTheme,
-                        onThemeSelected = { settingsViewModel.setTheme(it) },
-                        onBackTapped = { navController.popBackStack() }
+                        onThemeSelected = onThemeSelected,
+                        onBackTapped = onBackTapped
                     )
                 }
             }
