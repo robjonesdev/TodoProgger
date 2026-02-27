@@ -8,6 +8,7 @@ sealed interface TodoListScreenAction {
     data object OnRejectDeletion : TodoListScreenAction
     data object OnConfirmDeletion : TodoListScreenAction
     data class OnScheduleReminder(val task: TodoTask) : TodoListScreenAction
+    data object OnDismissReminderPicker : TodoListScreenAction
     data class OnToggleExpanded(val taskId: Int) : TodoListScreenAction
     data class OnToggleCompleted(val task: TodoTask) : TodoListScreenAction
     data class OnUpdateTask(val task: TodoTask) : TodoListScreenAction

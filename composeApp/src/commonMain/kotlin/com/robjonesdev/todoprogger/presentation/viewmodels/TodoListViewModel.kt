@@ -11,12 +11,7 @@ import kotlinx.coroutines.launch
 
 class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(TodoListState(
-        items = emptyList(),
-        showConfirmDeletionDialog = false,
-        selectedDeletionCandidate = null,
-        expandedItemIDs = emptySet()
-    ))
+    private val _uiState = MutableStateFlow(TodoListState())
     
     val uiState: StateFlow<TodoListState> = combine(
         todoDao.getAllTasks(),
@@ -66,7 +61,13 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
                     currentState.copy(expandedItemIDs = newExpandedSet)
                 }
             }
-            else -> { /* Handle others */ }
+            is TodoListScreenAction.OnScheduleReminder -> {
+                _uiState.update { it.copy(taskToSchedule = action.task) }
+            }
+            is TodoListScreenAction.OnDismissReminderPicker -> {
+                _uiState.update { it.copy(taskToSchedule = null) }
+            }
+            else -> { /* Navigation handled in UI layer */ }
         }
     }
 

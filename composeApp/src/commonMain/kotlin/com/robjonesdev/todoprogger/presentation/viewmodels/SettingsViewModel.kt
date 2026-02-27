@@ -8,9 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
-    // For now, we'll keep the theme in memory. 
-    // In a real app, you'd persist this using DataStore.
     private val _selectedTheme = MutableStateFlow(AppTheme.Green)
+
     val selectedTheme: StateFlow<AppTheme> = _selectedTheme
 
     fun setTheme(theme: AppTheme) {

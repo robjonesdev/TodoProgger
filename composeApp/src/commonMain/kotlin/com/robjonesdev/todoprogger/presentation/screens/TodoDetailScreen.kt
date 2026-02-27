@@ -11,39 +11,22 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.robjonesdev.todoprogger.domain.models.ProgressEntry
-import com.robjonesdev.todoprogger.domain.models.TodoTask
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.robjonesdev.todoprogger.presentation.actions.TodoDetailScreenAction
+import com.robjonesdev.todoprogger.presentation.state.TodoDetailState
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.Res
 import todoprogger.composeapp.generated.resources.todo_detail_screen_title
 
-val progressEntriesSaver: Saver<List<ProgressEntry>, String> = Saver(
-    save = { Json.encodeToString(it) },
-    restore = { Json.decodeFromString(it) }
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoDetailScreen(
-    todoTask: TodoTask,
-    onBackTapped: () -> Unit,
-    onSaveTapped: (TodoTask) -> Unit,
+    state: TodoDetailState,
+    onAction: (TodoDetailScreenAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var title by rememberSaveable { mutableStateOf(todoTask.title) }
-    var description by rememberSaveable { mutableStateOf(todoTask.description) }
-    var progressEntries by rememberSaveable(stateSaver = progressEntriesSaver) { mutableStateOf(todoTask.progressEntries) }
-    
-    var showAddEntryDialog by rememberSaveable { mutableStateOf(false) }
-    var newEntryText by rememberSaveable { mutableStateOf("") }
-    
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -51,7 +34,7 @@ fun TodoDetailScreen(
             TopAppBar(
                 title = { Text(text = stringResource(Res.string.todo_detail_screen_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBackTapped) {
+                    IconButton(onClick = { onAction(TodoDetailScreenAction.OnBackTapped) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -59,15 +42,7 @@ fun TodoDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { 
-                        onSaveTapped(
-                            todoTask.copy(
-                                title = title, 
-                                description = description,
-                                progressEntries = progressEntries
-                            )
-                        ) 
-                    }) {
+                    IconButton(onClick = { onAction(TodoDetailScreenAction.OnSaveTapped) }) {
                         Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
                     }
                 }
@@ -82,8 +57,8 @@ fun TodoDetailScreen(
                 .padding(16.dp)
         ) {
             TextField(
-                value = title,
-                onValueChange = { title = it },
+                value = state.title,
+                onValueChange = { onAction(TodoDetailScreenAction.OnTitleChanged(it)) },
                 textStyle = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -98,8 +73,8 @@ fun TodoDetailScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value = description,
-                onValueChange = { description = it },
+                value = state.description,
+                onValueChange = { onAction(TodoDetailScreenAction.OnDescriptionChanged(it)) },
                 textStyle = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -122,7 +97,7 @@ fun TodoDetailScreen(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-            progressEntries.forEach { progressEntry ->
+            state.progressEntries.forEach { progressEntry ->
                 ListItem(
                     headlineContent = {
                         Text(
@@ -148,7 +123,7 @@ fun TodoDetailScreen(
             }
 
             ListItem(
-                modifier = Modifier.clickable { showAddEntryDialog = true },
+                modifier = Modifier.clickable { onAction(TodoDetailScreenAction.OnAddEntryTapped) },
                 headlineContent = {
                     Text(
                         text = "Add new progress entry",
@@ -169,44 +144,25 @@ fun TodoDetailScreen(
         }
     }
 
-    if (showAddEntryDialog) {
+    if (state.showAddEntryDialog) {
         AlertDialog(
-            onDismissRequest = { 
-                showAddEntryDialog = false
-                newEntryText = ""
-            },
+            onDismissRequest = { onAction(TodoDetailScreenAction.OnDismissAddEntry) },
             title = { Text("New Progress Entry") },
             text = {
                 TextField(
-                    value = newEntryText,
-                    onValueChange = { newEntryText = it },
+                    value = state.newEntryText,
+                    onValueChange = { onAction(TodoDetailScreenAction.OnNewEntryTextChanged(it)) },
                     placeholder = { Text("Add an update") },
                     modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (newEntryText.isNotBlank()) {
-                            val newId = (progressEntries.maxOfOrNull { it.id } ?: 0) + 1
-                            val newEntry = ProgressEntry(
-                                id = newId,
-                                description = newEntryText
-                            )
-                            progressEntries = progressEntries + newEntry
-                        }
-                        showAddEntryDialog = false
-                        newEntryText = ""
-                    }
-                ) {
+                TextButton(onClick = { onAction(TodoDetailScreenAction.OnConfirmAddEntry) }) {
                     Text("Add")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { 
-                    showAddEntryDialog = false
-                    newEntryText = ""
-                }) {
+                TextButton(onClick = { onAction(TodoDetailScreenAction.OnDismissAddEntry) }) {
                     Text("Cancel")
                 }
             }
