@@ -6,82 +6,69 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.domain.models.TodoTask
-import com.robjonesdev.todoprogger.domain.utils.Logger
-import com.robjonesdev.todoprogger.domain.utils.e
+import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
+import com.robjonesdev.todoprogger.presentation.state.TodoListState
 
 /**
  * A list of [TodoTask] items with swipe-to-delete functionality.
  *
- * @param items The list of [TodoTask] objects to display.
- * @param onItemTapped Callback triggered when an item is tapped.
- * @param onDelete Callback triggered when an item is swiped to delete.
- * @param onUpdateTask Callback triggered when an item needs to be updated (e.g. toggling completion).
- * @param onScheduleReminder Callback triggered when the schedule icon is tapped.
+ * @param state The current [TodoListState] containing the items and UI state.
+ * @param action Callback triggered for various user actions on the list.
  * @param modifier The modifier to be applied to the underlying [LazyColumn].
- * @param listState The state of the [LazyColumn].
  */
 @Composable
 fun TodoList(
-    items: List<TodoTask>,
-    onItemTapped: (TodoTask) -> Unit,
-    onDelete: (TodoTask) -> Unit,
-    onUpdateTask: (TodoTask) -> Unit,
-    onScheduleReminder: (TodoTask) -> Unit,
+    state: TodoListState,
+    action: (TodoListScreenAction) -> Unit,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState()
 ) {
-
-    var showConfirmDeletionDialog by remember { mutableStateOf(false) }
-    var selectedDeletionCandidate by remember { mutableStateOf<TodoTask?>(null) }
+    val listState: LazyListState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
         modifier = modifier,
         contentPadding = PaddingValues(vertical = 8.dp)
     ) {
-        items(items, key = { it.id }) { item ->
+        items(state.items, key = { it.id }) { item ->
             AnimatedSwipeToDeleteContainer(
                 item = item,
-                isRemoved = (selectedDeletionCandidate?.id == item.id),
+                isRemoved = (state.selectedDeletionCandidate?.id == item.id),
                 onSwipeToDelete = {
-                    showConfirmDeletionDialog = true
-                    selectedDeletionCandidate = item
+                    action(TodoListScreenAction.OnSwipeToDelete(item))
                 },
                 modifier = Modifier.animateItem(),
             ) { task ->
                 TodoItem(
                     item = task,
-                    onToggleComplete = { onUpdateTask(it.copy(isCompleted = !it.isCompleted)) },
-                    onScheduleReminder = { onScheduleReminder(it) },
-                    onClick = { onItemTapped(task) }
+                    expanded = task.id in state.expandedItemIDs,
+                    onToggleExpanded = {
+                        action(TodoListScreenAction.OnToggleExpanded(task.id))
+                    },
+                    onToggleComplete = { 
+                        action(TodoListScreenAction.OnToggleCompleted(task))
+                    },
+                    onScheduleReminder = { 
+                        action(TodoListScreenAction.OnScheduleReminder(task))
+                    },
+                    onClick = { 
+                        action(TodoListScreenAction.OnItemTapped(task))
+                    }
                 )
             }
         }
     }
 
-    if(showConfirmDeletionDialog) {
+    if(state.showConfirmDeletionDialog) {
         ConfirmDeletionDialog(
-            todoName = selectedDeletionCandidate?.title ?: "Unknown",
+            todoName = state.selectedDeletionCandidate?.title ?: "Unknown",
             onRejectDeletion = {
-                showConfirmDeletionDialog = false
-                selectedDeletionCandidate = null
+                action(TodoListScreenAction.OnRejectDeletion)
            },
         ) {
-            onDelete(
-                selectedDeletionCandidate ?: run {
-                    Logger.e("ConfirmDeletionDialog", "No item selected for deletion")
-                    return@ConfirmDeletionDialog
-                }
-            )
-            showConfirmDeletionDialog = false
-            selectedDeletionCandidate = null
+            action(TodoListScreenAction.OnConfirmDeletion)
         }
     }
 }

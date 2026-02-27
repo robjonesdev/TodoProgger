@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
@@ -31,12 +30,13 @@ import com.robjonesdev.todoprogger.domain.models.TodoTask
 @Composable
 fun TodoItem(
     item: TodoTask,
+    expanded: Boolean,
     onToggleComplete: (TodoTask) -> Unit = {},
     onScheduleReminder: (TodoTask) -> Unit = {},
     onClick: () -> Unit,
+    onToggleExpanded: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var expanded by rememberSaveable{ mutableStateOf(false) }
 
     Card(
         onClick = onClick,
@@ -66,7 +66,7 @@ fun TodoItem(
                     modifier = Modifier.weight(1f)
                 )
                 
-                IconButton(onClick = { expanded = !expanded }) {
+                IconButton(onClick = { onToggleExpanded() }) {
                     Icon(
                         imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                         contentDescription = if (expanded) "Show less" else "Show more"

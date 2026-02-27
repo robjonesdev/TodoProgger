@@ -7,8 +7,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.robjonesdev.todoprogger.domain.models.TodoTask
+import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.TodoList
+import com.robjonesdev.todoprogger.presentation.state.TodoListState
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.Res
 import todoprogger.composeapp.generated.resources.todo_list_title
@@ -16,13 +17,9 @@ import todoprogger.composeapp.generated.resources.todo_list_title
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoListScreen(
-    todoTaskList: List<TodoTask>,
-    onAddNewTodo: () -> Unit,
+    state: TodoListState,
+    onAction: (TodoListScreenAction) -> Unit,
     onSettingsTapped: () -> Unit,
-    onDeleteTask: (TodoTask) -> Unit,
-    onUpdateTask: (TodoTask) -> Unit,
-    onScheduleReminder: (TodoTask) -> Unit,
-    onItemTapped: (TodoTask) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -37,7 +34,7 @@ fun TodoListScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = onAddNewTodo) {
+                    IconButton(onClick = { onAction(TodoListScreenAction.OnAddNewTodo) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add New Todo Button",
@@ -61,11 +58,8 @@ fun TodoListScreen(
     ) { innerPadding ->
         TodoList(
             modifier = Modifier.padding(innerPadding),
-            items = todoTaskList,
-            onItemTapped = onItemTapped,
-            onDelete = onDeleteTask,
-            onUpdateTask = onUpdateTask,
-            onScheduleReminder = onScheduleReminder
+            state = state,
+            action = onAction
         )
     }
 }

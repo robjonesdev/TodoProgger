@@ -13,6 +13,7 @@ import com.robjonesdev.todoprogger.data.getDatabase
 import com.robjonesdev.todoprogger.data.getDatabaseBuilder
 import com.robjonesdev.todoprogger.domain.models.TodoTask
 import com.robjonesdev.todoprogger.domain.reminders.getReminderScheduler
+import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.ReminderPickerDialog
 import com.robjonesdev.todoprogger.presentation.screens.TodoDetailScreen
 import com.robjonesdev.todoprogger.presentation.screens.TodoListScreen
@@ -26,7 +27,7 @@ fun TodoApp(context: Any? = null) {
     val database = remember { getDatabase(getDatabaseBuilder(context)) }
     val dao = remember { database.todoDao() }
     val todoListViewModel = remember { TodoListViewModel(dao) }
-    val todoTaskList by todoListViewModel.todoTasks.collectAsState()
+    val todoListState by todoListViewModel.uiState.collectAsState()
     
     val settingsViewModel = remember { SettingsViewModel() }
     val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
@@ -36,49 +37,24 @@ fun TodoApp(context: Any? = null) {
 
     val navController = rememberNavController()
 
-    // Optimization: Remember lambdas to prevent unnecessary recompositions of child screens
-    val onAddNewTodo = remember(todoListViewModel) { { todoListViewModel.addNewTodo() } }
-    val onDeleteTask = remember(todoListViewModel) { { task: TodoTask -> todoListViewModel.deleteTask(task) } }
-    val onUpdateTask = remember(todoListViewModel) { { task: TodoTask -> todoListViewModel.updateTask(task) } }
-    val onScheduleReminder = remember { { task: TodoTask -> taskToSchedule = task } }
-    
-    // Navigation Lambdas, keys passed here ensure that the composable still recomposes
-    // when the keys change
-    val onSettingsTapped = remember(navController) { 
-        { 
-            navController.navigate(TodoScreen.Settings.route) 
-            Unit
-        } 
+    val onSettingsTapped = remember(navController) { { navController.navigate(TodoScreen.Settings.route) } }
+    val onBackTapped = remember(navController) { { navController.popBackStack(); Unit } }
+    val onThemeSelected = remember(settingsViewModel) { { theme: com.robjonesdev.todoprogger.presentation.theme.AppTheme -> settingsViewModel.setTheme(theme) } }
+
+    val onTodoListAction = remember(todoListViewModel, navController) {
+        { action: TodoListScreenAction ->
+            when (action) {
+                is TodoListScreenAction.OnItemTapped -> {
+                    navController.navigate("detail/${action.task.id}")
+                }
+                is TodoListScreenAction.OnScheduleReminder -> {
+                    taskToSchedule = action.task
+                }
+                else -> todoListViewModel.onAction(action)
+            }
+        }
     }
 
-    val onItemTapped = remember(navController) { 
-        { task: TodoTask -> 
-            navController.navigate("detail/${task.id}")
-            Unit
-        } 
-    }
-
-    val onBackTapped = remember(navController) { 
-        { 
-            navController.popBackStack()
-            Unit
-        } 
-    }
-
-    val onSaveTask = remember(todoListViewModel, navController) { 
-        { task: TodoTask -> 
-            todoListViewModel.updateTask(task)
-            navController.popBackStack()
-            Unit
-        } 
-    }
-
-    val onThemeSelected = remember(settingsViewModel) { 
-        { theme: com.robjonesdev.todoprogger.presentation.theme.AppTheme -> 
-            settingsViewModel.setTheme(theme) 
-        } 
-    }
-    
     TodoProggerTheme(appTheme = selectedTheme) {
         Surface(
             modifier = androidx.compose.ui.Modifier.fillMaxSize(),
@@ -90,13 +66,9 @@ fun TodoApp(context: Any? = null) {
             ) {
                 composable(TodoScreen.List.route) {
                     TodoListScreen(
-                        todoTaskList = todoTaskList,
-                        onAddNewTodo = onAddNewTodo,
-                        onSettingsTapped = onSettingsTapped,
-                        onDeleteTask = onDeleteTask,
-                        onUpdateTask = onUpdateTask,
-                        onScheduleReminder = onScheduleReminder,
-                        onItemTapped = onItemTapped
+                        state = todoListState,
+                        onAction = onTodoListAction,
+                        onSettingsTapped = onSettingsTapped
                     )
                 }
                 composable(
@@ -104,13 +76,17 @@ fun TodoApp(context: Any? = null) {
                     arguments = listOf(navArgument("taskId") { type = NavType.IntType })
                 ) { backStackEntry ->
                     val taskId = backStackEntry.arguments?.getInt("taskId")
-                    val task = todoTaskList.find { it.id == taskId }
+                    val task = todoListState.items.find { it.id == taskId }
 
                     if (task != null) {
                         TodoDetailScreen(
                             todoTask = task,
                             onBackTapped = onBackTapped,
-                            onSaveTapped = onSaveTask
+                            onSaveTapped = { updatedTask ->
+                                // Fix: Use the new onUpdateTask action instead of toggling completion
+                                todoListViewModel.onAction(TodoListScreenAction.OnUpdateTask(updatedTask))
+                                navController.popBackStack()
+                            }
                         )
                     }
                 }
