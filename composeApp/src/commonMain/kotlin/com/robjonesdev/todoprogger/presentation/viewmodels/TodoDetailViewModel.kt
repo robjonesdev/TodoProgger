@@ -3,18 +3,24 @@ package com.robjonesdev.todoprogger.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import com.robjonesdev.todoprogger.domain.models.ProgressEntry
 import com.robjonesdev.todoprogger.domain.models.TodoTask
+import com.robjonesdev.todoprogger.domain.models.Category
 import com.robjonesdev.todoprogger.presentation.actions.TodoDetailScreenAction
 import com.robjonesdev.todoprogger.presentation.state.TodoDetailState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class TodoDetailViewModel(private val initialTask: TodoTask) : ViewModel() {
+class TodoDetailViewModel(
+    private val initialTask: TodoTask,
+    categories: List<Category>
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TodoDetailState(
         title = initialTask.title,
         description = initialTask.description,
-        progressEntries = initialTask.progressEntries
+        progressEntries = initialTask.progressEntries,
+        category = initialTask.category,
+        availableCategories = categories
     ))
     val uiState: StateFlow<TodoDetailState> = _uiState
 
@@ -25,6 +31,9 @@ class TodoDetailViewModel(private val initialTask: TodoTask) : ViewModel() {
             }
             is TodoDetailScreenAction.OnDescriptionChanged -> {
                 _uiState.update { it.copy(description = action.description) }
+            }
+            is TodoDetailScreenAction.OnCategoryChanged -> {
+                _uiState.update { it.copy(category = action.category) }
             }
             is TodoDetailScreenAction.OnAddEntryTapped -> {
                 _uiState.update { it.copy(showAddEntryDialog = true) }
@@ -55,7 +64,8 @@ class TodoDetailViewModel(private val initialTask: TodoTask) : ViewModel() {
         return initialTask.copy(
             title = _uiState.value.title,
             description = _uiState.value.description,
-            progressEntries = _uiState.value.progressEntries
+            progressEntries = _uiState.value.progressEntries,
+            category = _uiState.value.category
         )
     }
 }

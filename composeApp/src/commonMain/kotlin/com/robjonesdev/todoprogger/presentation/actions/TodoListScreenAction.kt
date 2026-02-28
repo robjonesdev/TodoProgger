@@ -13,4 +13,9 @@ sealed interface TodoListScreenAction {
     data class OnToggleCompleted(val task: TodoTask) : TodoListScreenAction
     data class OnUpdateTask(val task: TodoTask) : TodoListScreenAction
     data object OnAddNewTodo : TodoListScreenAction
+    data class OnCategorySelected(val category: String) : TodoListScreenAction
+    data object OnAddCategoryTapped : TodoListScreenAction
+    data class OnNewCategoryNameChanged(val name: String) : TodoListScreenAction
+    data object OnConfirmAddCategory : TodoListScreenAction
+    data object OnDismissAddCategory : TodoListScreenAction
 }

@@ -6,9 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.FiberManualRecord
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,11 +14,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.actions.TodoDetailScreenAction
 import com.robjonesdev.todoprogger.presentation.state.TodoDetailState
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.Res
 import todoprogger.composeapp.generated.resources.todo_detail_screen_title
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun TodoDetailScreen(
     state: TodoDetailState,
@@ -28,6 +29,7 @@ fun TodoDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    var showCategoryMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -70,7 +72,42 @@ fun TodoDetailScreen(
                 placeholder = { Text("Task Title", style = MaterialTheme.typography.headlineMedium) }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(modifier = Modifier.padding(start = 4.dp)) {
+                TextButton(
+                    onClick = { showCategoryMenu = true },
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Text(
+                        text = "Group: ${state.category}",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                DropdownMenu(
+                    expanded = showCategoryMenu,
+                    onDismissRequest = { showCategoryMenu = false }
+                ) {
+                    state.availableCategories.forEach { category ->
+                        DropdownMenuItem(
+                            text = { Text(category.name) },
+                            onClick = {
+                                onAction(TodoDetailScreenAction.OnCategoryChanged(category.name))
+                                showCategoryMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             TextField(
                 value = state.description,
@@ -98,11 +135,24 @@ fun TodoDetailScreen(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             state.progressEntries.forEach { progressEntry ->
+                val dateText = remember(progressEntry.timestamp) {
+                    val localDateTime = kotlin.time.Instant.fromEpochMilliseconds(progressEntry.timestamp)
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                    "${localDateTime.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${localDateTime.day}, ${localDateTime.year} ${localDateTime.hour.toString().padStart(2, '0')}:${localDateTime.minute.toString().padStart(2, '0')}"
+                }
+
                 ListItem(
                     headlineContent = {
                         Text(
                             text = progressEntry.description,
                             style = MaterialTheme.typography.bodyLarge
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = dateText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                     },
                     leadingContent = {

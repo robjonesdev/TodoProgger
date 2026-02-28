@@ -37,17 +37,15 @@ fun TodoApp(context: Any? = null) {
 
     val navController = rememberNavController()
 
-
-    val onSettingsTapped = remember(navController) { { navController.navigate(TodoScreen.Settings.route); Unit } }
+    val onSettingsTapped = remember(navController) { { navController.navigate(TodoScreen.Settings.route); } }
     val onBackTapped = remember(navController) { { navController.popBackStack(); Unit } }
-    val onThemeSelected = remember(settingsViewModel) { { theme: com.robjonesdev.todoprogger.presentation.theme.AppTheme -> settingsViewModel.setTheme(theme); Unit } }
+    val onThemeSelected = remember(settingsViewModel) { { theme: com.robjonesdev.todoprogger.presentation.theme.AppTheme -> settingsViewModel.setTheme(theme); } }
     
     val onTodoListAction = remember(todoListViewModel, navController) {
         { action: TodoListScreenAction ->
             when (action) {
                 is TodoListScreenAction.OnItemTapped -> {
                     navController.navigate("detail/${action.task.id}")
-                    Unit
                 }
                 else -> todoListViewModel.onAction(action)
             }
@@ -78,7 +76,12 @@ fun TodoApp(context: Any? = null) {
                     val initialTask = remember(taskId) { todoListState.items.find { it.id == taskId } }
 
                     if (initialTask != null) {
-                        val detailViewModel = remember(taskId) { TodoDetailViewModel(initialTask) }
+
+                        // TODO: I have some concerns that this being remembered at the nav level may
+                        //  result in some performance issues?
+                        val detailViewModel = remember(taskId) { 
+                            TodoDetailViewModel(initialTask, todoListState.categories) 
+                        }
                         val detailState by detailViewModel.uiState.collectAsState()
 
                         TodoDetailScreen(

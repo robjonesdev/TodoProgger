@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robjonesdev.todoprogger.data.TodoDao
 import com.robjonesdev.todoprogger.domain.models.TodoTask
+import com.robjonesdev.todoprogger.domain.models.Category
 import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.state.TodoListState
 import kotlinx.coroutines.flow.*
@@ -15,9 +16,16 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
     
     val uiState: StateFlow<TodoListState> = combine(
         todoDao.getAllTasks(),
+        todoDao.getAllCategories(),
         _uiState
-    ) { tasks, currentState ->
-        currentState.copy(items = tasks)
+    ) { tasks, categories, currentState ->
+        val finalCategories = categories.ifEmpty { listOf(Category("General")) }
+        val filteredItems = tasks.filter { it.category == currentState.selectedCategory.name }
+        
+        currentState.copy(
+            items = filteredItems,
+            categories = finalCategories
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -67,13 +75,39 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
             is TodoListScreenAction.OnDismissReminderPicker -> {
                 _uiState.update { it.copy(taskToSchedule = null) }
             }
+            is TodoListScreenAction.OnCategorySelected -> {
+                _uiState.update { it.copy(selectedCategory = Category(action.category)) }
+            }
+            is TodoListScreenAction.OnAddCategoryTapped -> {
+                _uiState.update { it.copy(showAddCategoryDialog = true) }
+            }
+            is TodoListScreenAction.OnNewCategoryNameChanged -> {
+                _uiState.update { it.copy(newCategoryName = action.name) }
+            }
+            is TodoListScreenAction.OnConfirmAddCategory -> {
+                viewModelScope.launch {
+                    val newName = _uiState.value.newCategoryName
+                    if (newName.isNotBlank()) {
+                        todoDao.insertCategory(Category(newName))
+                        _uiState.update { it.copy(
+                            selectedCategory = Category(newName),
+                            showAddCategoryDialog = false,
+                            newCategoryName = ""
+                        ) }
+                    }
+                }
+            }
+            is TodoListScreenAction.OnDismissAddCategory -> {
+                _uiState.update { it.copy(showAddCategoryDialog = false, newCategoryName = "") }
+            }
             else -> { /* Navigation handled in UI layer */ }
         }
     }
 
     private fun addNewTodo() {
         viewModelScope.launch {
-            todoDao.insertTask(TodoTask())
+            val newTodo = TodoTask(category = _uiState.value.selectedCategory.name)
+            todoDao.insertTask(newTodo)
         }
     }
 
