@@ -9,12 +9,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.theme.*
+import org.jetbrains.compose.resources.stringResource
+import todoprogger.composeapp.generated.resources.Res
+import todoprogger.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,12 +29,12 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(Res.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackTapped) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.action_back)
                         )
                     }
                 }
@@ -46,7 +48,7 @@ fun SettingsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Theme",
+                text = stringResource(Res.string.theme_section),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -82,7 +84,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(32.dp))
             
             Text(
-                text = "App Information",
+                text = stringResource(Res.string.app_info_section),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -90,15 +92,15 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             ListItem(
-                headlineContent = { Text("Version") },
+                headlineContent = { Text(stringResource(Res.string.version_label)) },
                 supportingContent = { Text("1.0.0") }
             )
             
             HorizontalDivider()
             
             ListItem(
-                headlineContent = { Text("Developer") },
-                supportingContent = { Text("Rob Jones") }
+                headlineContent = { Text(stringResource(Res.string.developer_label)) },
+                supportingContent = { Text(stringResource(Res.string.developer_name)) }
             )
         }
     }

@@ -16,8 +16,7 @@ import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.TodoList
 import com.robjonesdev.todoprogger.presentation.state.TodoListState
 import org.jetbrains.compose.resources.stringResource
-import todoprogger.composeapp.generated.resources.Res
-import todoprogger.composeapp.generated.resources.todo_list_title
+import todoprogger.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,14 +41,14 @@ fun TodoListScreen(
                     IconButton(onClick = { onAction(TodoListScreenAction.OnAddNewTodo) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Add New Todo Button",
+                            contentDescription = stringResource(Res.string.add_new_todo_cd),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     IconButton(onClick = onSettingsTapped) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings Button",
+                            contentDescription = stringResource(Res.string.settings_cd),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -85,8 +84,12 @@ fun TodoListScreen(
                     onClick = { onAction(TodoListScreenAction.OnAddCategoryTapped) },
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
-                            Text("New Group")
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                            Text(stringResource(Res.string.new_group))
                         }
                     }
                 )
@@ -103,12 +106,12 @@ fun TodoListScreen(
     if (state.showAddCategoryDialog) {
         AlertDialog(
             onDismissRequest = { onAction(TodoListScreenAction.OnDismissAddCategory) },
-            title = { Text("New Group") },
+            title = { Text(stringResource(Res.string.new_group)) },
             text = {
                 TextField(
                     value = state.newCategoryName,
                     onValueChange = { onAction(TodoListScreenAction.OnNewCategoryNameChanged(it)) },
-                    placeholder = { Text("Group Name") },
+                    placeholder = { Text(stringResource(Res.string.group_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -117,12 +120,12 @@ fun TodoListScreen(
                 TextButton(
                     onClick = { onAction(TodoListScreenAction.OnConfirmAddCategory) }
                 ) {
-                    Text("Add")
+                    Text(stringResource(Res.string.action_add))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onAction(TodoListScreenAction.OnDismissAddCategory) }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.action_cancel))
                 }
             }
         )

@@ -1,4 +1,60 @@
 <resources>
     <string name="todo_list_title">Todo Progger</string>
     <string name="todo_detail_screen_title">Editing Todo</string>
+
+    <!-- Actions -->
+    <string name="action_add">Add</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_back">Back</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_next">Next</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- To-do List Screen -->
+    <string name="add_new_todo_cd">Add New Todo Button</string>
+    <string name="settings_cd">Settings Button</string>
+    <string name="new_group">New Group</string>
+    <string name="group_name">Group Name</string>
+
+    <!-- To-do Detail Screen -->
+    <string name="task_title_placeholder">Task Title</string>
+    <string name="task_description_placeholder">Add more details...</string>
+    <string name="group_label">Group: %s</string>
+    <string name="progress_entries_title">Progress Entries</string>
+    <string name="add_progress_entry_hint">Add new progress entry</string>
+    <string name="add_progress_entry_cd">Add progress entry</string>
+    <string name="new_progress_entry_title">New Progress Entry</string>
+    <string name="new_progress_entry_placeholder">Add an update</string>
+
+    <!-- To-do Item -->
+    <string name="show_less_cd">Show less</string>
+    <string name="show_more_cd">Show more</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="set_reminder_cd">Set reminder</string>
+    <string name="completed">Completed</string>
+    <string name="complete">Complete</string>
+    <string name="mark_as_complete_cd">Mark as complete</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="theme_section">Theme</string>
+    <string name="app_info_section">App Information</string>
+    <string name="version_label">Version</string>
+    <string name="developer_label">Developer</string>
+    <string name="developer_name">Rob Jones</string>
+
+    <!-- Deletion Dialog -->
+    <string name="delete_dialog_title">Delete Todo?</string>
+    <string name="delete_dialog_description">Are you certain you want to delete the Todo: \"%s\"? This cannot be undone.</string>
+    <string name="delete_dialog_confirm">Yes, Delete It</string>
+    <string name="delete_dialog_dismiss">No, Keep It</string>
+
+    <!-- Reminder Picker -->
+    <string name="select_time_title">Select Time</string>
+
+    <!-- Default Values -->
+    <string name="default_todo_title">New To-Do</string>
+    <string name="default_todo_description">Tap to edit, Swipe left to delete</string>
+    <string name="default_category">General</string>
 </resources>

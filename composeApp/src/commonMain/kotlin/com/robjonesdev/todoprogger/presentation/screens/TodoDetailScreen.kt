@@ -18,7 +18,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.Res
-import todoprogger.composeapp.generated.resources.todo_detail_screen_title
+import todoprogger.composeapp.generated.resources.*
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -39,13 +39,13 @@ fun TodoDetailScreen(
                     IconButton(onClick = { onAction(TodoDetailScreenAction.OnBackTapped) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.action_back)
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { onAction(TodoDetailScreenAction.OnSaveTapped) }) {
-                        Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
+                        Icon(imageVector = Icons.Default.Check, contentDescription = stringResource(Res.string.action_save))
                     }
                 }
             )
@@ -69,7 +69,7 @@ fun TodoDetailScreen(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                placeholder = { Text("Task Title", style = MaterialTheme.typography.headlineMedium) }
+                placeholder = { Text(stringResource(Res.string.task_title_placeholder), style = MaterialTheme.typography.headlineMedium) }
             )
 
 
@@ -80,7 +80,7 @@ fun TodoDetailScreen(
                     modifier = Modifier.height(32.dp)
                 ) {
                     Text(
-                        text = "Group: ${state.category}",
+                        text = stringResource(Res.string.group_label, state.category),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -120,13 +120,13 @@ fun TodoDetailScreen(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                placeholder = { Text("Add more details...") }
+                placeholder = { Text(stringResource(Res.string.task_description_placeholder)) }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Progress Entries",
+                text = stringResource(Res.string.progress_entries_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -176,7 +176,7 @@ fun TodoDetailScreen(
                 modifier = Modifier.clickable { onAction(TodoDetailScreenAction.OnAddEntryTapped) },
                 headlineContent = {
                     Text(
-                        text = "Add new progress entry",
+                        text = stringResource(Res.string.add_progress_entry_hint),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
@@ -184,7 +184,7 @@ fun TodoDetailScreen(
                 leadingContent = {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add progress entry",
+                        contentDescription = stringResource(Res.string.add_progress_entry_cd),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 },
@@ -197,23 +197,23 @@ fun TodoDetailScreen(
     if (state.showAddEntryDialog) {
         AlertDialog(
             onDismissRequest = { onAction(TodoDetailScreenAction.OnDismissAddEntry) },
-            title = { Text("New Progress Entry") },
+            title = { Text(stringResource(Res.string.new_progress_entry_title)) },
             text = {
                 TextField(
                     value = state.newEntryText,
                     onValueChange = { onAction(TodoDetailScreenAction.OnNewEntryTextChanged(it)) },
-                    placeholder = { Text("Add an update") },
+                    placeholder = { Text(stringResource(Res.string.new_progress_entry_placeholder)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {
                 TextButton(onClick = { onAction(TodoDetailScreenAction.OnConfirmAddEntry) }) {
-                    Text("Add")
+                    Text(stringResource(Res.string.action_add))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onAction(TodoDetailScreenAction.OnDismissAddEntry) }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.action_cancel))
                 }
             }
         )
