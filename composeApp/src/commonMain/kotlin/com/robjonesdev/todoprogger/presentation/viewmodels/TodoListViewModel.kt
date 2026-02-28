@@ -12,6 +12,10 @@ import kotlinx.coroutines.launch
 
 class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
 
+    companion object {
+        const val DONE_CATEGORY_NAME = "Done"
+    }
+
     private val _uiState = MutableStateFlow(TodoListState())
     
     val uiState: StateFlow<TodoListState> = combine(
@@ -19,12 +23,21 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
         todoDao.getAllCategories(),
         _uiState
     ) { tasks, categories, currentState ->
-        val finalCategories = categories.ifEmpty { listOf(Category("General")) }
-        val filteredItems = tasks.filter { it.category == currentState.selectedCategory.name }
+        val dbCategories = categories.ifEmpty { listOf(Category("General")) }
+
+        val allTabs = dbCategories + Category(DONE_CATEGORY_NAME)
+        
+        val filteredItems = if (currentState.selectedCategory.name == DONE_CATEGORY_NAME) {
+           // "Done" tab shows all completed tasks regardless of their group
+            tasks.filter { it.isCompleted }
+        } else {
+            // Other tabs show only active tasks belonging to that group
+            tasks.filter { it.category == currentState.selectedCategory.name && !it.isCompleted }
+        }
         
         currentState.copy(
             items = filteredItems,
-            categories = finalCategories
+            categories = allTabs
         )
     }.stateIn(
         scope = viewModelScope,
@@ -75,9 +88,6 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
             is TodoListScreenAction.OnDismissReminderPicker -> {
                 _uiState.update { it.copy(taskToSchedule = null) }
             }
-            is TodoListScreenAction.OnCategoryDeleteAttempt -> {
-                _uiState.update { it.copy(selectedCategoryDeletionCandidate = action.category) }
-            }
             is TodoListScreenAction.OnCategorySelected -> {
                 _uiState.update { it.copy(selectedCategory = action.category) }
             }
@@ -87,13 +97,10 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
             is TodoListScreenAction.OnNewCategoryNameChanged -> {
                 _uiState.update { it.copy(newCategoryName = action.name) }
             }
-            is TodoListScreenAction.OnDismissAddCategory -> {
-                _uiState.update { it.copy(showAddCategoryDialog = false, newCategoryName = "") }
-            }
             is TodoListScreenAction.OnConfirmAddCategory -> {
                 viewModelScope.launch {
                     val newName = _uiState.value.newCategoryName
-                    if (newName.isNotBlank()) {
+                    if (newName.isNotBlank() && newName != DONE_CATEGORY_NAME) {
                         todoDao.insertCategory(Category(newName))
                         _uiState.update { it.copy(
                             selectedCategory = Category(newName),
@@ -103,13 +110,23 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
                     }
                 }
             }
+            is TodoListScreenAction.OnDismissAddCategory -> {
+                _uiState.update { it.copy(showAddCategoryDialog = false, newCategoryName = "") }
+            }
+            is TodoListScreenAction.OnCategoryDeleteAttempt -> {
+                if (action.category.name != DONE_CATEGORY_NAME && action.category.name != "General") {
+                    _uiState.update { it.copy(selectedCategoryDeletionCandidate = action.category) }
+                }
+            }
             is TodoListScreenAction.OnConfirmDeleteCategory -> {
                 viewModelScope.launch {
-                    val deletionCandidate = _uiState.value.selectedCategoryDeletionCandidate
-                    deletionCandidate?.run {
-                        todoDao.deleteCategory(deletionCandidate.name)
-                        _uiState.update { it.copy(selectedCategoryDeletionCandidate = null) }
+                    _uiState.value.selectedCategoryDeletionCandidate?.let {
+                        todoDao.deleteCategory(it.name)
                     }
+                    _uiState.update { it.copy(
+                        selectedCategoryDeletionCandidate = null,
+                        selectedCategory = Category("General")
+                    ) }
                 }
             }
             is TodoListScreenAction.OnDismissDeleteCategory -> {
@@ -121,7 +138,12 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
 
     private fun addNewTodo() {
         viewModelScope.launch {
-            val newTodo = TodoTask(category = _uiState.value.selectedCategory.name)
+            val targetCategory = if (_uiState.value.selectedCategory.name == DONE_CATEGORY_NAME) {
+                "General"
+            } else {
+                _uiState.value.selectedCategory.name
+            }
+            val newTodo = TodoTask(category = targetCategory)
             todoDao.insertTask(newTodo)
         }
     }

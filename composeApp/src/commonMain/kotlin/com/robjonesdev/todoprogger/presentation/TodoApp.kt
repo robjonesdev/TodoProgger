@@ -76,11 +76,13 @@ fun TodoApp(context: Any? = null) {
                     val initialTask = remember(taskId) { todoListState.items.find { it.id == taskId } }
 
                     if (initialTask != null) {
+                        // Filter out the virtual "Done" category from the selection list
+                        val filteredCategories = remember(todoListState.categories) {
+                            todoListState.categories.filter { it.name != TodoListViewModel.DONE_CATEGORY_NAME }
+                        }
 
-                        // TODO: I have some concerns that this being remembered at the nav level may
-                        //  result in some performance issues?
                         val detailViewModel = remember(taskId) { 
-                            TodoDetailViewModel(initialTask, todoListState.categories) 
+                            TodoDetailViewModel(initialTask, filteredCategories)
                         }
                         val detailState by detailViewModel.uiState.collectAsState()
 

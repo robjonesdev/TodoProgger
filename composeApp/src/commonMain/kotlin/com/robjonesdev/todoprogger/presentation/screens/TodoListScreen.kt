@@ -1,7 +1,6 @@
 package com.robjonesdev.todoprogger.presentation.screens
 
 import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -16,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.TodoList
 import com.robjonesdev.todoprogger.presentation.state.TodoListState
-import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.*
 
@@ -86,7 +84,6 @@ fun TodoListScreen(
                                     // Custom gesture logic: Fallback to tap if long press isn't reached
                                     .pointerInput(category) {
                                         awaitEachGesture {
-                                            val down = awaitFirstDown()
                                             val longPressTimeout = 500L
                                             
                                             // Wait for either the timeout (long press) or the finger to lift
