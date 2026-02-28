@@ -1,6 +1,8 @@
 package com.robjonesdev.todoprogger.presentation.screens
 
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -14,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.TodoList
 import com.robjonesdev.todoprogger.presentation.state.TodoListState
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.*
 
@@ -74,18 +77,31 @@ fun TodoListScreen(
                 state.categories.forEach { category ->
                     Tab(
                         selected = state.selectedCategory.name == category.name,
-                        onClick = { onAction(TodoListScreenAction.OnCategorySelected(category)) },
+                        onClick = { /* Handled in custom pointerInput below */ },
                         text = {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(vertical = 12.dp)
+                                    // Custom gesture logic: Fallback to tap if long press isn't reached
                                     .pointerInput(category) {
-                                        detectTapGestures(
-                                            onLongPress = {
-                                                onAction(TodoListScreenAction.OnCategoryDeleteAttempt(category))
+                                        awaitEachGesture {
+                                            val down = awaitFirstDown()
+                                            val longPressTimeout = 500L
+                                            
+                                            // Wait for either the timeout (long press) or the finger to lift
+                                            val up = withTimeoutOrNull(longPressTimeout) {
+                                                waitForUpOrCancellation()
                                             }
-                                        )
+
+                                            if (up == null) {
+                                                // Timeout reached: It's a Long Press
+                                                onAction(TodoListScreenAction.OnCategoryDeleteAttempt(category))
+                                            } else {
+                                                // Finger lifted before timeout: It's a Tap
+                                                onAction(TodoListScreenAction.OnCategorySelected(category))
+                                            }
+                                        }
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
