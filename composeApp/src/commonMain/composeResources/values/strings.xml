@@ -20,7 +20,7 @@
     <!-- To-do Detail Screen -->
     <string name="task_title_placeholder">Task Title</string>
     <string name="task_description_placeholder">Add more details...</string>
-    <string name="group_label">Group: %s</string>
+    <string name="group_label">Group: %1$s</string>
     <string name="progress_entries_title">Progress Entries</string>
     <string name="add_progress_entry_hint">Add new progress entry</string>
     <string name="add_progress_entry_cd">Add progress entry</string>
