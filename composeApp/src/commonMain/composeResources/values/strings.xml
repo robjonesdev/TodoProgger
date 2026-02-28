@@ -16,6 +16,8 @@
     <string name="settings_cd">Settings Button</string>
     <string name="new_group">New Group</string>
     <string name="group_name">Group Name</string>
+    <string name="delete_category">Delete Category</string>
+    <string name="delete_category_description">Are you sure you want to delete the category: "%1$s"?</string>
 
     <!-- To-do Detail Screen -->
     <string name="task_title_placeholder">Task Title</string>

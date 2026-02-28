@@ -1,5 +1,6 @@
 package com.robjonesdev.todoprogger.presentation.actions
 
+import com.robjonesdev.todoprogger.domain.models.Category
 import com.robjonesdev.todoprogger.domain.models.TodoTask
 
 sealed interface TodoListScreenAction {
@@ -13,9 +14,12 @@ sealed interface TodoListScreenAction {
     data class OnToggleCompleted(val task: TodoTask) : TodoListScreenAction
     data class OnUpdateTask(val task: TodoTask) : TodoListScreenAction
     data object OnAddNewTodo : TodoListScreenAction
-    data class OnCategorySelected(val category: String) : TodoListScreenAction
+    data class OnCategorySelected(val category: Category) : TodoListScreenAction
+    data class OnCategoryDeleteAttempt(val category: Category) : TodoListScreenAction
     data object OnAddCategoryTapped : TodoListScreenAction
     data class OnNewCategoryNameChanged(val name: String) : TodoListScreenAction
     data object OnConfirmAddCategory : TodoListScreenAction
     data object OnDismissAddCategory : TodoListScreenAction
+    data object OnConfirmDeleteCategory : TodoListScreenAction
+    data object OnDismissDeleteCategory : TodoListScreenAction
 }

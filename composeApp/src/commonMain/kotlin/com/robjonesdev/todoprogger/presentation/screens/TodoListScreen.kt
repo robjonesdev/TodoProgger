@@ -1,9 +1,7 @@
 package com.robjonesdev.todoprogger.presentation.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
@@ -11,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.TodoList
@@ -75,15 +74,34 @@ fun TodoListScreen(
                 state.categories.forEach { category ->
                     Tab(
                         selected = state.selectedCategory.name == category.name,
-                        onClick = { onAction(TodoListScreenAction.OnCategorySelected(category.name)) },
-                        text = { Text(category.name) }
+                        onClick = { onAction(TodoListScreenAction.OnCategorySelected(category)) },
+                        text = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 12.dp)
+                                    .pointerInput(category) {
+                                        detectTapGestures(
+                                            onLongPress = {
+                                                onAction(TodoListScreenAction.OnCategoryDeleteAttempt(category))
+                                            }
+                                        )
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(category.name)
+                            }
+                        }
                     )
                 }
                 Tab(
                     selected = false,
                     onClick = { onAction(TodoListScreenAction.OnAddCategoryTapped) },
                     text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = null,
@@ -125,6 +143,28 @@ fun TodoListScreen(
             },
             dismissButton = {
                 TextButton(onClick = { onAction(TodoListScreenAction.OnDismissAddCategory) }) {
+                    Text(stringResource(Res.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if(state.selectedCategoryDeletionCandidate != null) {
+        AlertDialog(
+            onDismissRequest = { onAction(TodoListScreenAction.OnDismissDeleteCategory) },
+            title = { Text(stringResource(Res.string.delete_category)) },
+            text = {
+                Text(text = stringResource(Res.string.delete_category_description, state.selectedCategoryDeletionCandidate.name))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { onAction(TodoListScreenAction.OnConfirmDeleteCategory) }
+                ) {
+                    Text(stringResource(Res.string.action_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onAction(TodoListScreenAction.OnDismissDeleteCategory) }) {
                     Text(stringResource(Res.string.action_cancel))
                 }
             }

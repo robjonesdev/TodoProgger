@@ -35,7 +35,7 @@ fun TodoList(
         items(state.items, key = { it.id }) { item ->
             AnimatedSwipeToDeleteContainer(
                 item = item,
-                isRemoved = (state.selectedDeletionCandidate?.id == item.id),
+                isRemoved = (state.selectedTodoDeletionCandidate?.id == item.id),
                 onSwipeToDelete = {
                     action(TodoListScreenAction.OnSwipeToDelete(item))
                 },
@@ -63,7 +63,7 @@ fun TodoList(
 
     if(state.showConfirmDeletionDialog) {
         ConfirmDeletionDialog(
-            todoName = state.selectedDeletionCandidate?.title ?: "Unknown",
+            todoName = state.selectedTodoDeletionCandidate?.title ?: "Unknown",
             onRejectDeletion = {
                 action(TodoListScreenAction.OnRejectDeletion)
            },

@@ -40,23 +40,23 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
             is TodoListScreenAction.OnSwipeToDelete -> {
                 _uiState.update { it.copy(
                     showConfirmDeletionDialog = true,
-                    selectedDeletionCandidate = action.task
+                    selectedTodoDeletionCandidate = action.task
                 ) }
             }
             is TodoListScreenAction.OnRejectDeletion -> {
                 _uiState.update { it.copy(
                     showConfirmDeletionDialog = false,
-                    selectedDeletionCandidate = null
+                    selectedTodoDeletionCandidate = null
                 ) }
             }
             is TodoListScreenAction.OnConfirmDeletion -> {
-                val taskToDelete = _uiState.value.selectedDeletionCandidate
+                val taskToDelete = _uiState.value.selectedTodoDeletionCandidate
                 if (taskToDelete != null) {
                     deleteTask(taskToDelete)
                 }
                 _uiState.update { it.copy(
                     showConfirmDeletionDialog = false,
-                    selectedDeletionCandidate = null
+                    selectedTodoDeletionCandidate = null
                 ) }
             }
             is TodoListScreenAction.OnToggleExpanded -> {
@@ -75,14 +75,20 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
             is TodoListScreenAction.OnDismissReminderPicker -> {
                 _uiState.update { it.copy(taskToSchedule = null) }
             }
+            is TodoListScreenAction.OnCategoryDeleteAttempt -> {
+                _uiState.update { it.copy(selectedCategoryDeletionCandidate = action.category) }
+            }
             is TodoListScreenAction.OnCategorySelected -> {
-                _uiState.update { it.copy(selectedCategory = Category(action.category)) }
+                _uiState.update { it.copy(selectedCategory = action.category) }
             }
             is TodoListScreenAction.OnAddCategoryTapped -> {
                 _uiState.update { it.copy(showAddCategoryDialog = true) }
             }
             is TodoListScreenAction.OnNewCategoryNameChanged -> {
                 _uiState.update { it.copy(newCategoryName = action.name) }
+            }
+            is TodoListScreenAction.OnDismissAddCategory -> {
+                _uiState.update { it.copy(showAddCategoryDialog = false, newCategoryName = "") }
             }
             is TodoListScreenAction.OnConfirmAddCategory -> {
                 viewModelScope.launch {
@@ -97,8 +103,17 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
                     }
                 }
             }
-            is TodoListScreenAction.OnDismissAddCategory -> {
-                _uiState.update { it.copy(showAddCategoryDialog = false, newCategoryName = "") }
+            is TodoListScreenAction.OnConfirmDeleteCategory -> {
+                viewModelScope.launch {
+                    val deletionCandidate = _uiState.value.selectedCategoryDeletionCandidate
+                    deletionCandidate?.run {
+                        todoDao.deleteCategory(deletionCandidate.name)
+                        _uiState.update { it.copy(selectedCategoryDeletionCandidate = null) }
+                    }
+                }
+            }
+            is TodoListScreenAction.OnDismissDeleteCategory -> {
+                _uiState.update { it.copy(selectedCategoryDeletionCandidate = null) }
             }
             else -> { /* Navigation handled in UI layer */ }
         }
