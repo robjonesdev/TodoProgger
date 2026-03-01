@@ -1,7 +1,5 @@
 package com.robjonesdev.todoprogger.presentation.screens
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -10,10 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.composables.TodoList
+import com.robjonesdev.todoprogger.presentation.composables.detectGestures
 import com.robjonesdev.todoprogger.presentation.state.TodoListState
 import org.jetbrains.compose.resources.stringResource
 import todoprogger.composeapp.generated.resources.*
@@ -75,35 +73,15 @@ fun TodoListScreen(
                 state.categories.forEach { category ->
                     Tab(
                         selected = state.selectedCategory.name == category.name,
-                        onClick = { /* Handled in custom pointerInput below */ },
+                        onClick = { /* Logic handled manually in pointerInput to allow custom timing */ },
+                        modifier = Modifier.detectGestures(
+                            key = category,
+                            onTap = { onAction(TodoListScreenAction.OnCategorySelected(category)) },
+                            onSwipe = { /* Purposeful No-Op, enable standard behaviour of SecondaryScrollableTabRow */ },
+                            onLongPress = { onAction(TodoListScreenAction.OnCategoryDeleteAttempt(category)) },
+                        ),
                         text = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(vertical = 12.dp)
-                                    // Custom gesture logic: Fallback to tap if long press isn't reached
-                                    .pointerInput(category) {
-                                        awaitEachGesture {
-                                            val longPressTimeout = 500L
-                                            
-                                            // Wait for either the timeout (long press) or the finger to lift
-                                            val up = withTimeoutOrNull(longPressTimeout) {
-                                                waitForUpOrCancellation()
-                                            }
-
-                                            if (up == null) {
-                                                // Timeout reached: It's a Long Press
-                                                onAction(TodoListScreenAction.OnCategoryDeleteAttempt(category))
-                                            } else {
-                                                // Finger lifted before timeout: It's a Tap
-                                                onAction(TodoListScreenAction.OnCategorySelected(category))
-                                            }
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(category.name)
-                            }
+                            Text(category.name)
                         }
                     )
                 }
