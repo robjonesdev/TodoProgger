@@ -10,5 +10,7 @@ data class TodoDetailState(
     val category: String = "General",
     val availableCategories: List<Category> = emptyList(),
     val showAddEntryDialog: Boolean = false,
+    val selectedEntryToEdit: ProgressEntry? = null,
+    val selectedEntryToDelete: ProgressEntry? = null,
     val newEntryText: String = "",
 )

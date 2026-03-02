@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.robjonesdev.todoprogger.presentation.actions.TodoDetailScreenAction
+import com.robjonesdev.todoprogger.presentation.composables.detectGestures
 import com.robjonesdev.todoprogger.presentation.state.TodoDetailState
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -142,6 +143,12 @@ fun TodoDetailScreen(
                 }
 
                 ListItem(
+                    modifier = Modifier.detectGestures(
+                        key = progressEntry,
+                        onTap = { onAction(TodoDetailScreenAction.OnEditEntryTapped(progressEntry)) },
+                        onSwipe = { /* No-op */ },
+                        onLongPress = {  onAction(TodoDetailScreenAction.OnDeleteEntryAttempt(progressEntry)) }
+                    ),
                     headlineContent = {
                         Text(
                             text = progressEntry.description,
@@ -197,7 +204,7 @@ fun TodoDetailScreen(
     if (state.showAddEntryDialog) {
         AlertDialog(
             onDismissRequest = { onAction(TodoDetailScreenAction.OnDismissAddEntry) },
-            title = { Text(stringResource(Res.string.new_progress_entry_title)) },
+            title = { Text(if (state.selectedEntryToEdit != null) "Edit Progress Entry" else stringResource(Res.string.new_progress_entry_title)) },
             text = {
                 TextField(
                     value = state.newEntryText,
@@ -208,12 +215,30 @@ fun TodoDetailScreen(
             },
             confirmButton = {
                 TextButton(onClick = { onAction(TodoDetailScreenAction.OnConfirmAddEntry) }) {
-                    Text(stringResource(Res.string.action_add))
+                    Text(if (state.selectedEntryToEdit != null) "Update" else stringResource(Res.string.action_add))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onAction(TodoDetailScreenAction.OnDismissAddEntry) }) {
                     Text(stringResource(Res.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (state.selectedEntryToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { onAction(TodoDetailScreenAction.OnDismissDeleteEntry) },
+            title = { Text("Delete Entry?") },
+            text = { Text("Are you sure you want to delete this progress update?") },
+            confirmButton = {
+                TextButton(onClick = { onAction(TodoDetailScreenAction.OnConfirmDeleteEntry) }) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onAction(TodoDetailScreenAction.OnDismissDeleteEntry) }) {
+                    Text("Cancel")
                 }
             }
         )

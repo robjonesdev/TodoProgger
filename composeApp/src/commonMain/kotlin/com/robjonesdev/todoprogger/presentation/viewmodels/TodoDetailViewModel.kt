@@ -36,7 +36,27 @@ class TodoDetailViewModel(
                 _uiState.update { it.copy(category = action.category) }
             }
             is TodoDetailScreenAction.OnAddEntryTapped -> {
-                _uiState.update { it.copy(showAddEntryDialog = true) }
+                _uiState.update { it.copy(showAddEntryDialog = true, selectedEntryToEdit = null, newEntryText = "") }
+            }
+            is TodoDetailScreenAction.OnEditEntryTapped -> {
+                _uiState.update { it.copy(
+                    showAddEntryDialog = true, 
+                    selectedEntryToEdit = action.entry,
+                    newEntryText = action.entry.description
+                ) }
+            }
+            is TodoDetailScreenAction.OnDeleteEntryAttempt -> {
+                _uiState.update { it.copy(selectedEntryToDelete = action.entry) }
+            }
+            is TodoDetailScreenAction.OnConfirmDeleteEntry -> {
+                val entryToDelete = _uiState.value.selectedEntryToDelete
+                if (entryToDelete != null) {
+                    val updatedEntries = _uiState.value.progressEntries.filter { it.id != entryToDelete.id }
+                    _uiState.update { it.copy(progressEntries = updatedEntries, selectedEntryToDelete = null) }
+                }
+            }
+            is TodoDetailScreenAction.OnDismissDeleteEntry -> {
+                _uiState.update { it.copy(selectedEntryToDelete = null) }
             }
             is TodoDetailScreenAction.OnNewEntryTextChanged -> {
                 _uiState.update { it.copy(newEntryText = action.text) }
@@ -44,17 +64,25 @@ class TodoDetailViewModel(
             is TodoDetailScreenAction.OnConfirmAddEntry -> {
                 val currentText = _uiState.value.newEntryText
                 if (currentText.isNotBlank()) {
-                    val newId = (_uiState.value.progressEntries.maxOfOrNull { it.id } ?: 0) + 1
-                    val newEntry = ProgressEntry(id = newId, description = currentText)
-                    _uiState.update { it.copy(
-                        progressEntries = it.progressEntries + newEntry,
-                        showAddEntryDialog = false,
-                        newEntryText = ""
-                    ) }
+                    val editingEntry = _uiState.value.selectedEntryToEdit
+                    if (editingEntry != null) {
+                        val updatedEntries = _uiState.value.progressEntries.map { 
+                            if (it.id == editingEntry.id) it.copy(description = currentText) else it 
+                        }
+                        _uiState.update { it.copy(progressEntries = updatedEntries, showAddEntryDialog = false, newEntryText = "") }
+                    } else {
+                        val newId = (_uiState.value.progressEntries.maxOfOrNull { it.id } ?: 0) + 1
+                        val newEntry = ProgressEntry(id = newId, description = currentText)
+                        _uiState.update { it.copy(
+                            progressEntries = it.progressEntries + newEntry,
+                            showAddEntryDialog = false,
+                            newEntryText = ""
+                        ) }
+                    }
                 }
             }
             is TodoDetailScreenAction.OnDismissAddEntry -> {
-                _uiState.update { it.copy(showAddEntryDialog = false, newEntryText = "") }
+                _uiState.update { it.copy(showAddEntryDialog = false, newEntryText = "", selectedEntryToEdit = null) }
             }
             else -> { /* Navigation handled in UI */ }
         }

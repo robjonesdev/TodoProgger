@@ -28,9 +28,9 @@ import androidx.compose.ui.input.pointer.pointerInput
  */
 fun <T : Any> Modifier.detectGestures(
     key: T,
-    onTap: (T) -> Unit,
-    onSwipe: (T) -> Unit,
-    onLongPress: (T) -> Unit,
+    onTap: (T) -> Unit = {},
+    onSwipe: (T) -> Unit = {},
+    onLongPress: (T) -> Unit = {},
 ): Modifier {
     return this.pointerInput(key) {
         // touchSlop is the system-defined threshold (in pixels) that a finger
