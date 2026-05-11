@@ -14,6 +14,7 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
 
     companion object {
         const val DONE_CATEGORY_NAME = "Done"
+        const val GENERAL_CATEGORY_NAME = "General"
     }
 
     private val _uiState = MutableStateFlow(TodoListState())
@@ -23,21 +24,35 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
         todoDao.getAllCategories(),
         _uiState
     ) { tasks, categories, currentState ->
-        val dbCategories = categories.ifEmpty { listOf(Category("General")) }
+        // Ensure "General" is always in the list even if not in DB
+        val baseCategories = if (categories.any { it.name == GENERAL_CATEGORY_NAME }) {
+            categories
+        } else {
+            listOf(Category(GENERAL_CATEGORY_NAME)) + categories
+        }
 
-        val allTabs = dbCategories + Category(DONE_CATEGORY_NAME)
+        // Always append "Done" as the last tab, ensuring no duplicates
+        val allTabs = (baseCategories.filter { it.name != DONE_CATEGORY_NAME } + Category(DONE_CATEGORY_NAME))
         
-        val filteredItems = if (currentState.selectedCategory.name == DONE_CATEGORY_NAME) {
+        // Validate selected category exists, fallback to General if it doesn't (e.g. after deletion)
+        val validatedSelectedCategory = if (allTabs.any { it.name == currentState.selectedCategory.name }) {
+            currentState.selectedCategory
+        } else {
+            Category(GENERAL_CATEGORY_NAME)
+        }
+
+        val filteredItems = if (validatedSelectedCategory.name == DONE_CATEGORY_NAME) {
            // "Done" tab shows all completed tasks regardless of their group
             tasks.filter { it.isCompleted }
         } else {
             // Other tabs show only active tasks belonging to that group
-            tasks.filter { it.category == currentState.selectedCategory.name && !it.isCompleted }
+            tasks.filter { it.category == validatedSelectedCategory.name && !it.isCompleted }
         }
         
         currentState.copy(
             items = filteredItems,
-            categories = allTabs
+            categories = allTabs,
+            selectedCategory = validatedSelectedCategory
         )
     }.stateIn(
         scope = viewModelScope,
@@ -114,7 +129,7 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
                 _uiState.update { it.copy(showAddCategoryDialog = false, newCategoryName = "") }
             }
             is TodoListScreenAction.OnCategoryDeleteAttempt -> {
-                if (action.category.name != DONE_CATEGORY_NAME && action.category.name != "General") {
+                if (action.category.name != DONE_CATEGORY_NAME && action.category.name != GENERAL_CATEGORY_NAME) {
                     _uiState.update { it.copy(selectedCategoryDeletionCandidate = action.category) }
                 }
             }
@@ -125,7 +140,7 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
                     }
                     _uiState.update { it.copy(
                         selectedCategoryDeletionCandidate = null,
-                        selectedCategory = Category("General")
+                        selectedCategory = Category(GENERAL_CATEGORY_NAME)
                     ) }
                 }
             }
@@ -139,7 +154,7 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
     private fun addNewTodo() {
         viewModelScope.launch {
             val targetCategory = if (_uiState.value.selectedCategory.name == DONE_CATEGORY_NAME) {
-                "General"
+                GENERAL_CATEGORY_NAME
             } else {
                 _uiState.value.selectedCategory.name
             }
