@@ -8,7 +8,6 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
@@ -26,18 +25,10 @@ fun <T> AnimatedSwipeToDeleteContainer(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
                 onSwipeToDelete(item)
-                true
-            } else {
-                false
             }
+            false
         }
     )
-
-    LaunchedEffect(isRemoved) {
-        if (!isRemoved && state.currentValue != SwipeToDismissBoxValue.Settled) {
-            state.reset()
-        }
-    }
 
     AnimatedVisibility(
         visible = !isRemoved,
