@@ -45,7 +45,8 @@ fun TodoItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .animateContentSize(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -62,14 +63,15 @@ fun TodoItem(
                     text = item.title,
                     style = MaterialTheme.typography.titleLarge,
                     textDecoration = if (item.isCompleted) TextDecoration.LineThrough else null,
-                    color = if (item.isCompleted) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurface,
+                    color = if (item.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)
                 )
                 
                 IconButton(onClick = { onToggleExpanded() }) {
                     Icon(
                         imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (expanded) "Show less" else "Show more"
+                        contentDescription = if (expanded) "Show less" else "Show more",
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -81,7 +83,7 @@ fun TodoItem(
                         Text(
                             text = item.description,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                         )
                     }
 
@@ -100,7 +102,11 @@ fun TodoItem(
                                     contentDescription = "Set reminder",
                                     modifier = Modifier.size(SuggestionChipDefaults.IconSize)
                                 )
-                            }
+                            },
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                labelColor = MaterialTheme.colorScheme.primary,
+                                iconContentColor = MaterialTheme.colorScheme.primary
+                            )
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -122,7 +128,10 @@ fun TodoItem(
                                     iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             } else {
-                                SuggestionChipDefaults.suggestionChipColors()
+                                SuggestionChipDefaults.suggestionChipColors(
+                                    labelColor = MaterialTheme.colorScheme.primary,
+                                    iconContentColor = MaterialTheme.colorScheme.primary
+                                )
                             }
                         )
                     }

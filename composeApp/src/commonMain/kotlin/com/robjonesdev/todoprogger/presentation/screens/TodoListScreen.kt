@@ -39,21 +39,20 @@ fun TodoListScreen(
                     IconButton(onClick = { onAction(TodoListScreenAction.OnAddNewTodo) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(Res.string.add_new_todo_cd),
-                            tint = MaterialTheme.colorScheme.primary
+                            contentDescription = stringResource(Res.string.add_new_todo_cd)
                         )
                     }
                     IconButton(onClick = onSettingsTapped) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = stringResource(Res.string.settings_cd),
-                            tint = MaterialTheme.colorScheme.primary
+                            contentDescription = stringResource(Res.string.settings_cd)
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
         }

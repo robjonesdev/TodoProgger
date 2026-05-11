@@ -50,7 +50,13 @@ fun TodoDetailScreen(
                     IconButton(onClick = { onAction(TodoDetailScreenAction.OnSaveTapped) }) {
                         Icon(imageVector = Icons.Default.Check, contentDescription = stringResource(Res.string.action_save))
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
     ) { innerPadding ->
@@ -79,23 +85,26 @@ fun TodoDetailScreen(
 
 
             Box(modifier = Modifier.padding(start = 4.dp)) {
-                TextButton(
+                AssistChip(
                     onClick = { showCategoryMenu = true },
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                    modifier = Modifier.height(32.dp)
-                ) {
-                    Text(
-                        text = stringResource(Res.string.group_label, state.category),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
+                    label = {
+                        Text(
+                            text = stringResource(Res.string.group_label, state.category),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    colors = AssistChipDefaults.assistChipColors(
+                        labelColor = MaterialTheme.colorScheme.primary,
+                        trailingIconContentColor = MaterialTheme.colorScheme.primary
                     )
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+                )
                 DropdownMenu(
                     expanded = showCategoryMenu,
                     onDismissRequest = { showCategoryMenu = false }
@@ -189,14 +198,14 @@ fun TodoDetailScreen(
                     Text(
                         text = stringResource(Res.string.add_progress_entry_hint),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                     )
                 },
                 leadingContent = {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = stringResource(Res.string.add_progress_entry_cd),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                     )
                 },
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)

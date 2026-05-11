@@ -37,7 +37,12 @@ fun SettingsScreen(
                             contentDescription = stringResource(Res.string.action_back)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
     ) { innerPadding ->
@@ -91,17 +96,28 @@ fun SettingsScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            ListItem(
-                headlineContent = { Text(stringResource(Res.string.version_label)) },
-                supportingContent = { Text("1.0.0") }
-            )
-            
-            HorizontalDivider()
-            
-            ListItem(
-                headlineContent = { Text(stringResource(Res.string.developer_label)) },
-                supportingContent = { Text(stringResource(Res.string.developer_name)) }
-            )
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Column {
+                    ListItem(
+                        headlineContent = { Text(stringResource(Res.string.version_label)) },
+                        supportingContent = { Text("1.0.0") },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    )
+                    
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                    
+                    ListItem(
+                        headlineContent = { Text(stringResource(Res.string.developer_label)) },
+                        supportingContent = { Text(stringResource(Res.string.developer_name)) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    )
+                }
+            }
         }
     }
 }
@@ -119,9 +135,11 @@ fun ThemeColorItem(
             .background(color)
             .border(
                 width = if (isSelected) 3.dp else 0.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                 shape = CircleShape
             )
+            .padding(if (isSelected) 4.dp else 0.dp)
+            .clip(CircleShape)
             .clickable { onClick() }
     )
 }
