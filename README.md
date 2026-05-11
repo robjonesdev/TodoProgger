@@ -1,35 +1,56 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# TodoProgger
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+TodoProgger is a feature-rich Kotlin Multiplatform (KMP) To-Do application designed to help you track progress on your tasks with detailed entries, categorization, and scheduled reminders. It uses Compose Multiplatform to provide a seamless and consistent user experience on both Android and iOS.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Features
 
-### Build and Run Android Application
+- **Task Management**: Create, edit, and organize your tasks effortlessly.
+- **Progress Tracking**: Add multiple timestamped progress updates to each task to keep a detailed history of your work.
+- **Categorization**: Group your tasks into custom categories (e.g., General, Work, Personal) with dedicated tabs.
+- **Reminders**: Schedule local notifications for tasks to ensure you never miss a deadline.
+- **Dynamic Theming**: Choose from multiple color themes that adapt to system dark mode and persist across app restarts.
+- **Persistent Storage**: Uses **Room** for robust task and category data management and **Jetpack DataStore** for application settings.
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+## Project Structure
 
-### Build and Run iOS Application
+This project follows the standard Kotlin Multiplatform structure:
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+*   **[:composeApp](./composeApp)**: Contains the shared business logic, data layer, and Compose UI.
+    *   **[commonMain](./composeApp/src/commonMain/kotlin)**: Core logic, ViewModels, screens, and database definitions.
+    *   **[androidMain](./composeApp/src/androidMain/kotlin)**: Android-specific implementations such as the database builder and reminder scheduler.
+    *   **[iosMain](./composeApp/src/iosMain/kotlin)**: iOS-specific implementations.
+*   **[:iosApp](./iosApp)**: The native iOS project that hosts the shared Compose application.
+
+## Getting Started
+
+### Prerequisites
+
+- **Android Studio** (Koala or newer recommended)
+- **Xcode** (For building and running the iOS application)
+- **JDK 17 or higher**
+
+### Build and Run
+
+#### Android Application
+You can run the app directly from Android Studio or via the command line:
+- **Windows**: `.\gradlew.bat :composeApp:assembleDebug`
+- **macOS/Linux**: `./gradlew :composeApp:assembleDebug`
+
+#### iOS Application
+1. Open the `iosApp` directory in Xcode.
+2. Select a simulator or a connected iOS device.
+3. Click **Run** (or `Cmd + R`).
+
+Alternatively, use the **Kotlin Multiplatform Mobile (KMM)** plugin in Android Studio to launch the iOS app directly from the IDE.
+
+## Technologies Used
+
+- **Compose Multiplatform**: UI framework for shared code.
+- **Room Database**: Local data persistence with multiplatform support.
+- **DataStore (Preferences)**: Key-value storage for app settings and theme persistence.
+- **Kotlinx Coroutines & Flow**: For reactive state management.
+- **Navigation Compose**: Type-safe navigation within the shared code.
+- **Kotlinx Datetime**: Multiplatform date and time handling.
+- **Material 3**: Modern UI components and theming.
 
 ---
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
