@@ -9,6 +9,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,7 @@ fun TodoDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    var showCategoryMenu by remember { mutableStateOf(false) }
+    var showCategoryMenu by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {

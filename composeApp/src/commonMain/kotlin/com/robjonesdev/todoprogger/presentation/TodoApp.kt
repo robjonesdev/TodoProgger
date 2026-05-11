@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,10 +28,10 @@ import com.robjonesdev.todoprogger.presentation.viewmodels.SettingsViewModel
 fun TodoApp(context: Any? = null) {
     val database = remember { getDatabase(getDatabaseBuilder(context)) }
     val dao = remember { database.todoDao() }
-    val todoListViewModel = remember { TodoListViewModel(dao) }
+    val todoListViewModel = viewModel { TodoListViewModel(dao) }
     val todoListState by todoListViewModel.uiState.collectAsState()
     
-    val settingsViewModel = remember { SettingsViewModel() }
+    val settingsViewModel = viewModel { SettingsViewModel() }
     val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
     
     val reminderScheduler = remember { getReminderScheduler(context) }
@@ -81,7 +82,7 @@ fun TodoApp(context: Any? = null) {
                             todoListState.categories.filter { it.name != TodoListViewModel.DONE_CATEGORY_NAME }
                         }
 
-                        val detailViewModel = remember(taskId) { 
+                        val detailViewModel: TodoDetailViewModel = viewModel(key = "detail_$taskId") {
                             TodoDetailViewModel(initialTask, filteredCategories)
                         }
                         val detailState by detailViewModel.uiState.collectAsState()
