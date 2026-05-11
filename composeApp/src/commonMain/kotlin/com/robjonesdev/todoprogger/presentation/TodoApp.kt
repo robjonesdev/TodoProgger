@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.robjonesdev.todoprogger.data.getDatabase
 import com.robjonesdev.todoprogger.data.getDatabaseBuilder
+import com.robjonesdev.todoprogger.data.createDataStore
 import com.robjonesdev.todoprogger.domain.reminders.getReminderScheduler
 import com.robjonesdev.todoprogger.presentation.actions.TodoListScreenAction
 import com.robjonesdev.todoprogger.presentation.actions.TodoDetailScreenAction
@@ -28,10 +29,11 @@ import com.robjonesdev.todoprogger.presentation.viewmodels.SettingsViewModel
 fun TodoApp(context: Any? = null) {
     val database = remember { getDatabase(getDatabaseBuilder(context)) }
     val dao = remember { database.todoDao() }
-    val todoListViewModel = viewModel { TodoListViewModel(dao) }
+    val todoListViewModel: TodoListViewModel = viewModel { TodoListViewModel(dao) }
     val todoListState by todoListViewModel.uiState.collectAsState()
     
-    val settingsViewModel = viewModel { SettingsViewModel() }
+    val dataStore = remember { createDataStore(context) }
+    val settingsViewModel: SettingsViewModel = viewModel { SettingsViewModel(dataStore) }
     val selectedTheme by settingsViewModel.selectedTheme.collectAsState()
     
     val reminderScheduler = remember { getReminderScheduler(context) }
