@@ -34,6 +34,7 @@ fun TodoDetailScreen(
     var showCategoryMenu by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(Res.string.todo_detail_screen_title)) },
@@ -54,9 +55,11 @@ fun TodoDetailScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
+                .imePadding()
                 .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
@@ -199,6 +202,7 @@ fun TodoDetailScreen(
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 

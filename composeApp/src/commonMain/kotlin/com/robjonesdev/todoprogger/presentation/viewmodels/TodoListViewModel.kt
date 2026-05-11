@@ -50,7 +50,7 @@ class TodoListViewModel(private val todoDao: TodoDao) : ViewModel() {
         }
         
         currentState.copy(
-            items = filteredItems,
+            items = filteredItems.sortedByDescending { it.id },
             categories = allTabs,
             selectedCategory = validatedSelectedCategory
         )
